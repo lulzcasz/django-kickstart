@@ -1,0 +1,29 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    command: uv run manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    environment:
+      - DATABASE_HOST=database
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+        - action: sync+restart
+          path: uv.lock
+          target: /app/uv.lock
+  database:
+    image: postgres:18-alpine3.22
+    environment:
+      POSTGRES_DB: django_kickstart
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
